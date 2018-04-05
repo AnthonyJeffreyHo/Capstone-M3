@@ -35,6 +35,8 @@ public class BoardControls extends AppCompatActivity {
 
     public static String EXTRA_ADDRESS = "device_address";
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
