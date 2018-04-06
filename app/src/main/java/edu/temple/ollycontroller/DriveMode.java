@@ -246,6 +246,7 @@ public class DriveMode extends AppCompatActivity{
 
     private void turnOffBoard()//DISARMS THE ESC
     {
+        speed = 100;
         if (btSocket!=null)
         {
             int message_id =  + (rng.nextInt(89)+10);
