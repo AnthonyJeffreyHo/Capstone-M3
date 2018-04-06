@@ -1,21 +1,28 @@
 package edu.temple.ollycontroller;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -51,10 +58,83 @@ public class DriveMode extends AppCompatActivity{
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        turnOffBoard();
+    }
+
+
+    Location pre_loc = null;
+    private float getSpeed(Location curr_loc){
+        if(curr_loc.hasSpeed()){return curr_loc.getSpeed();}
+        if(pre_loc != null){
+            float distance_traveled = pre_loc.distanceTo(curr_loc);
+            long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
+            return (distance_traveled/time_since_last_location);
+        }
+        else {
+            pre_loc = curr_loc;
+            return 0;
+        }
+
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drive_mode);
+
+
+
+        //------------------------------------Start of Speed Tracking------------------------------------
+        TextView speed_textview = (TextView) findViewById(R.id.speed_textview);
+        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        LocationListener ll = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
+
+        //------------------------------------End of Speed Tracking------------------------------------
+
+
+
+
+
+
+
 
 
 
@@ -71,7 +151,7 @@ public class DriveMode extends AppCompatActivity{
         btnLeft = (Button) findViewById(R.id.leftButton);
         btnRight = (Button) findViewById(R.id.rightButton);
         btnStart = (Button) findViewById(R.id.start_button);
-        btnOn = (Button) findViewById(R.id.on_button);
+        //btnOn = (Button) findViewById(R.id.on_button);
         btnOff = (Button) findViewById(R.id.off_button);
 
         atMax = MediaPlayer.create(this, R.raw.pew);
@@ -124,14 +204,14 @@ public class DriveMode extends AppCompatActivity{
                 //program a thing to pop the activity form the stack
             }
         });
-
+/*
         btnOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 turnOnBoard();
             }
         });
-
+*/
         btnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -228,7 +308,7 @@ public class DriveMode extends AppCompatActivity{
 
     private void turnOnBoard()//ARMS THE ESC
     {
-
+        speed = 100;
         if (btSocket!=null)
         {
             try
@@ -248,6 +328,7 @@ public class DriveMode extends AppCompatActivity{
 
     private void turnOffBoard()//DISARMS THE ESC
     {
+        speed = 100;
         if(!turnedOff) {
             speed = 100;
             if (btSocket != null) {
@@ -258,6 +339,8 @@ public class DriveMode extends AppCompatActivity{
                 try {
                     String message = "off";
                     btSocket.getOutputStream().write(message.getBytes());
+                    Disconnect();
+                    finish();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -310,8 +393,7 @@ public class DriveMode extends AppCompatActivity{
     }
 
     private void stopBoard(){
-        if (btSocket!=null)
-        {
+        speed = 100;
             try
             {
                 int message_id =  + (rng.nextInt(89)+10);
@@ -323,11 +405,12 @@ public class DriveMode extends AppCompatActivity{
             {
                 msg("Error");
             }
-        }
+
     }
 
     private void startBoard()//STARTS BOARD MOVEMENT AND LAUNCHES DRIVE MODE ACTIVITY
     {
+        String message;
         speed = 100;
         if (btSocket!=null)
         {
@@ -335,10 +418,10 @@ public class DriveMode extends AppCompatActivity{
             {
                 int message_id =  + (rng.nextInt(89)+10);
                 //String message = "g" + message_id;
-                String message = "off";
-                btSocket.getOutputStream().write(message.getBytes());
-                 message = "on";
-                btSocket.getOutputStream().write(message.getBytes());
+                //String message = "off";
+                //btSocket.getOutputStream().write(message.getBytes());
+                 //message = "on";
+                //btSocket.getOutputStream().write(message.getBytes());
                 message = "start";
                 btSocket.getOutputStream().write(message.getBytes());
                 //Disconnect();
@@ -379,7 +462,7 @@ public class DriveMode extends AppCompatActivity{
                     //speed should equal 120
                     speed = maxSpeed;
                     Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
-                   // atMax.start();
+                    atMax.start();
 
 
                 }
@@ -410,7 +493,7 @@ public class DriveMode extends AppCompatActivity{
                     speed = minSpeed;
 
                     Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                  //  atMin.start();
+                    atMin.start();
                 }
             }
             catch (IOException e)
@@ -513,7 +596,9 @@ public class DriveMode extends AppCompatActivity{
             {
                 msg("Connected.");
                 isBtConnected = true;
-                startBoard();
+                //startBoard();
+                turnOffBoard();
+                turnOnBoard();
             }
             progress.dismiss();
         }
@@ -559,7 +644,6 @@ public class DriveMode extends AppCompatActivity{
             }
         }
     }
-
 
 
 

@@ -57,45 +57,7 @@ public class BoardControls extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_controls);
 
-        //------------------------------------Start of Speed Tracking------------------------------------
-        TextView speed_textview = (TextView) findViewById(R.id.speed_textview);
-        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        LocationListener ll = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
-
-        //------------------------------------End of Speed Tracking------------------------------------
 
 
        // Random rng = new Random();
@@ -248,20 +210,7 @@ public class BoardControls extends AppCompatActivity {
     }
 
     //----------------------------------------Start of Private Stuff That Does The Low Level Stuff----------------------------------------
-    Location pre_loc = null;
-    private float getSpeed(Location curr_loc){
-        if(curr_loc.hasSpeed()){return curr_loc.getSpeed();}
-        if(pre_loc != null){
-            float distance_traveled = pre_loc.distanceTo(curr_loc);
-            long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
-            return (distance_traveled/time_since_last_location);
-        }
-        else {
-            pre_loc = curr_loc;
-            return 0;
-        }
 
-    }
 
     final Random rng = new Random();
 
