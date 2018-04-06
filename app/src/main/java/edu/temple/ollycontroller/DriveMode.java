@@ -106,7 +106,8 @@ public class DriveMode extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 stopBoard();
-                finish();
+                //finish();
+                //program a thing to pop the activity form the stack
             }
         });
 
@@ -141,6 +142,27 @@ public class DriveMode extends AppCompatActivity{
         } else {
             return super.dispatchKeyEvent(event);
         }
+    }
+
+
+
+
+
+    //--------------------------Low Level Stuff--------------------------
+
+    private void Disconnect()//DISCONNECTING THE PHONE FROM THE BLUETOOTH MODULE
+    {
+        if (btSocket!=null) //If the btSocket is busy
+        {
+            try
+            {
+                btSocket.close(); //close connection
+            }
+            catch (IOException e)
+            { msg("Error");}
+        }
+        finish(); //return to the first layout
+
     }
 
     private void turnOnBoard()//ARMS THE ESC
@@ -239,6 +261,36 @@ public class DriveMode extends AppCompatActivity{
         }
     }
 
+    private void startBoard()//STARTS BOARD MOVEMENT AND LAUNCHES DRIVE MODE ACTIVITY
+    {
+        if (btSocket!=null)
+        {
+            try
+            {
+                int message_id =  + (rng.nextInt(89)+10);
+                //String message = "g" + message_id;
+                String message = "on";
+                btSocket.getOutputStream().write(message.getBytes());
+                message = "start";
+                btSocket.getOutputStream().write(message.getBytes());
+                //Disconnect();
+
+
+                // Make an intent to start next activity.
+                //Intent i = new Intent(BoardControls.this, DriveMode.class);
+
+                //Change the activity.
+                //i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
+                //startActivity(i);
+
+            }
+            catch (IOException e)
+            {
+                msg("Error");
+            }
+        }
+    }
+
     Random rng = new Random();
 
     private void accelerateBoard(){
@@ -301,12 +353,10 @@ public class DriveMode extends AppCompatActivity{
     }
 
 
-
     private void msg(String s)
     {
         Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
-
 
     private void alertDialog(){
 
@@ -350,9 +400,6 @@ public class DriveMode extends AppCompatActivity{
         dialog.show();
 
     }
-
-
-
 
     private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
     {
@@ -398,6 +445,7 @@ public class DriveMode extends AppCompatActivity{
             {
                 msg("Connected.");
                 isBtConnected = true;
+                startBoard();
             }
             progress.dismiss();
         }

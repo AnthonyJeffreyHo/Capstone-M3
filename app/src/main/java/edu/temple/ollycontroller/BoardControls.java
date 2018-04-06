@@ -128,7 +128,7 @@ public class BoardControls extends AppCompatActivity {
 
 
         //--------------------------------------Show dialog with paired devices list------------------------------------
-        alertDialog();
+        //alertDialog();
 
         //new ConnectBT().execute(); //Call the class to connect
 
@@ -263,7 +263,6 @@ public class BoardControls extends AppCompatActivity {
 
     }
 
-
     final Random rng = new Random();
 
     private void Disconnect()//DISCONNECTING THE PHONE FROM THE BLUETOOTH MODULE
@@ -328,17 +327,17 @@ public class BoardControls extends AppCompatActivity {
 
     private void startBoard()//STARTS BOARD MOVEMENT AND LAUNCHES DRIVE MODE ACTIVITY
     {
-        if (btSocket!=null)
-        {
-            try
-            {
+        //if (btSocket!=null)
+        //{
+            //try
+            //{
                 int message_id =  + (rng.nextInt(89)+10);
                 //String message = "g" + message_id;
                 String message = "on";
-                btSocket.getOutputStream().write(message.getBytes());
-                message = "start";
-                btSocket.getOutputStream().write(message.getBytes());
-                Disconnect();
+                //btSocket.getOutputStream().write(message.getBytes());
+                //message = "start";
+                //btSocket.getOutputStream().write(message.getBytes());
+                //Disconnect();
 
 
                 // Make an intent to start next activity.
@@ -348,12 +347,12 @@ public class BoardControls extends AppCompatActivity {
                 i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
                 startActivity(i);
 
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
+            //}
+            //catch (IOException e)
+            //{
+            //    msg("Error");
+            //}
+        //}
     }
 
     private void stopBoard()//STOPS BOARD MOVEMENT
