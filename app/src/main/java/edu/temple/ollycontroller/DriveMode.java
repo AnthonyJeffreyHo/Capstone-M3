@@ -66,8 +66,8 @@ public class DriveMode extends AppCompatActivity{
         btnLeft = (Button) findViewById(R.id.leftButton);
         btnRight = (Button) findViewById(R.id.rightButton);
 
-        atMax = MediaPlayer.create(DriveMode.this, R.raw.pew);
-        atMin = MediaPlayer.create(DriveMode.this, R.raw.strange);
+        atMax = MediaPlayer.create(this, R.raw.pew);
+        atMin = MediaPlayer.create(this, R.raw.strange);
 
 
         //new ConnectBT().execute(); //Call the class to connect

@@ -402,7 +402,7 @@ public class BoardControls extends AppCompatActivity {
             try
             {
                 //speed range 100-118
-                if (speed <= maxSpeed){//UPPER ROCKER BUTTON
+                if (speed < maxSpeed){//UPPER ROCKER BUTTON
                     int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
                     //String message = "v" + message_id;
@@ -415,7 +415,7 @@ public class BoardControls extends AppCompatActivity {
                     //speed should equal 120
                     speed = maxSpeed;
                     Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
-                    atMax.start();
+                   // atMax.start();
 
 
                 }
@@ -447,7 +447,7 @@ public class BoardControls extends AppCompatActivity {
                     speed = minSpeed;
 
                     Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                    atMin.start();
+                    //atMin.start();
                 }
             }
             catch (IOException e)
