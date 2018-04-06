@@ -341,21 +341,21 @@ public class BoardControls extends AppCompatActivity {
 
                 // Make an intent to start next activity.
 
-        try
-        {//a for arm
-            String message = "on";
-            btSocket.getOutputStream().write(message.getBytes());
+        //try
+        //{//a for arm
+            //String message = "on";
+            //btSocket.getOutputStream().write(message.getBytes());
 
             Intent i = new Intent(BoardControls.this, DriveMode.class);
 
             //Change the activity.
             i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
             startActivity(i);
-        }
-        catch (IOException e)
-        {
-            msg("Error");
-    }
+        //}
+        //catch (IOException e)
+        //{
+        //    msg("Error");
+        //}
 
             //}
             //catch (IOException e)
