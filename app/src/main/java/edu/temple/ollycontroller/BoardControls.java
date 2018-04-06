@@ -98,7 +98,7 @@ public class BoardControls extends AppCompatActivity {
         //------------------------------------End of Speed Tracking------------------------------------
 
 
-        Random rng = new Random();
+       // Random rng = new Random();
 
         String message = null;
 
@@ -331,7 +331,7 @@ public class BoardControls extends AppCompatActivity {
         //{
             //try
             //{
-                int message_id =  + (rng.nextInt(89)+10);
+                //int message_id =  + (rng.nextInt(89)+10);
                 //String message = "g" + message_id;
                 //btSocket.getOutputStream().write(message.getBytes());
                 //message = "start";
@@ -345,16 +345,17 @@ public class BoardControls extends AppCompatActivity {
         {//a for arm
             String message = "on";
             btSocket.getOutputStream().write(message.getBytes());
+
+            Intent i = new Intent(BoardControls.this, DriveMode.class);
+
+            //Change the activity.
+            i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
+            startActivity(i);
         }
         catch (IOException e)
         {
             msg("Error");
-        }
-                Intent i = new Intent(BoardControls.this, DriveMode.class);
-
-                //Change the activity.
-                i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
-                startActivity(i);
+    }
 
             //}
             //catch (IOException e)
