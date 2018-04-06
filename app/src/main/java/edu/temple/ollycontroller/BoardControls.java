@@ -57,14 +57,14 @@ public class BoardControls extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_controls);
 
-
+        //------------------------------------Start of Speed Tracking------------------------------------
         TextView speed_textview = (TextView) findViewById(R.id.speed_textview);
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         LocationListener ll = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                speed_textview.setText(getSpeed(location) + "");
+                speed_textview.setText("Current Speed: " + getSpeed(location) + " M/S");
             }
 
             @Override
@@ -94,6 +94,8 @@ public class BoardControls extends AppCompatActivity {
             return;
         }
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
+
+        //------------------------------------End of Speed Tracking------------------------------------
 
 
         Random rng = new Random();
