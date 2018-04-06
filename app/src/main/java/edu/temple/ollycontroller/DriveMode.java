@@ -250,8 +250,9 @@ public class DriveMode extends AppCompatActivity{
         {
             int message_id =  + (rng.nextInt(89)+10);
             //String message = "d" + message_id;
-            String message = "off";
+
             try {
+                String message = "off";
                 btSocket.getOutputStream().write(message.getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -329,7 +330,9 @@ public class DriveMode extends AppCompatActivity{
             {
                 int message_id =  + (rng.nextInt(89)+10);
                 //String message = "g" + message_id;
-                String message = "on";
+                String message = "off";
+                btSocket.getOutputStream().write(message.getBytes());
+                 message = "on";
                 btSocket.getOutputStream().write(message.getBytes());
                 message = "start";
                 btSocket.getOutputStream().write(message.getBytes());
@@ -360,9 +363,9 @@ public class DriveMode extends AppCompatActivity{
             {
                 //speed range 100-118
                 if (speed < maxSpeed){
-                    int message_id =  + (rng.nextInt(89)+10);
+                    //int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
-                    String message = "v" + message_id;
+                    String message = "accel";
                     btSocket.getOutputStream().write(message.getBytes());
                     //message = "on";
                     //btSocket.getOutputStream().write(message.getBytes());
@@ -391,7 +394,7 @@ public class DriveMode extends AppCompatActivity{
                 if (speed > minSpeed) {
                     int message_id =  + (rng.nextInt(89)+10);
                     speed -= 2;
-                    String message = "p" + message_id;
+                    String message = "decel";
                     btSocket.getOutputStream().write(message.getBytes());
                     //message = "on";
                     //btSocket.getOutputStream().write(message.getBytes());

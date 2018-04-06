@@ -333,7 +333,6 @@ public class BoardControls extends AppCompatActivity {
             //{
                 int message_id =  + (rng.nextInt(89)+10);
                 //String message = "g" + message_id;
-                String message = "on";
                 //btSocket.getOutputStream().write(message.getBytes());
                 //message = "start";
                 //btSocket.getOutputStream().write(message.getBytes());
@@ -341,6 +340,16 @@ public class BoardControls extends AppCompatActivity {
 
 
                 // Make an intent to start next activity.
+
+        try
+        {//a for arm
+            String message = "on";
+            btSocket.getOutputStream().write(message.getBytes());
+        }
+        catch (IOException e)
+        {
+            msg("Error");
+        }
                 Intent i = new Intent(BoardControls.this, DriveMode.class);
 
                 //Change the activity.
