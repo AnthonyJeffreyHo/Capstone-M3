@@ -37,7 +37,7 @@ public class DriveMode extends AppCompatActivity{
 
     int speed = 100;
     Button stopButton;
-    Button btnLeft, btnRight, btnStop;
+    Button btnLeft, btnRight, btnStop, btnStart, btnOn, btnOff;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -65,6 +65,9 @@ public class DriveMode extends AppCompatActivity{
         stopButton = (Button) findViewById(R.id.driveStop);
         btnLeft = (Button) findViewById(R.id.leftButton);
         btnRight = (Button) findViewById(R.id.rightButton);
+        btnStart = (Button) findViewById(R.id.start_button);
+        btnOn = (Button) findViewById(R.id.on_button);
+        btnOff = (Button) findViewById(R.id.off_button);
 
         atMax = MediaPlayer.create(this, R.raw.pew);
         atMin = MediaPlayer.create(this, R.raw.strange);
@@ -101,6 +104,12 @@ public class DriveMode extends AppCompatActivity{
 
         //------------------------------------------------------------------------------------------------------------------------------
         //commands to be sent to bluetooth
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startBoard();
+            }
+        });
 
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +117,20 @@ public class DriveMode extends AppCompatActivity{
                 stopBoard();
                 //finish();
                 //program a thing to pop the activity form the stack
+            }
+        });
+
+        btnOn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                turnOnBoard();
+            }
+        });
+
+        btnOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                turnOffBoard();
             }
         });
 
@@ -124,6 +147,8 @@ public class DriveMode extends AppCompatActivity{
                 rightTurn();
             }
         });
+
+
 
     }
 
