@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -18,6 +19,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +37,7 @@ public class DriveMode extends AppCompatActivity{
     final int minSpeed = 100;
     MediaPlayer atMax;
     MediaPlayer atMin;
+    ArrayList<String> results;
 
     int speed = 100;
     Button stopButton;
@@ -149,6 +153,37 @@ public class DriveMode extends AppCompatActivity{
         });
 
 
+
+
+        btnLeft.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                //specify free form input
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please start speaking");
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ENGLISH);
+
+                startActivityForResult(intent, 2);return true;
+            }
+
+        });
+
+        btnRight.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                //specify free form input
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please start speaking");
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ENGLISH);
+
+                startActivityForResult(intent, 2);return true;
+            }
+
+        });
 
     }
 
@@ -476,7 +511,34 @@ public class DriveMode extends AppCompatActivity{
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == 2){
+            results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            String text = results.get(0);
 
+            switch (text){
+                case "stop":
+                    stopBoard();
+                    break;
+                case "speed up":
+                    accelerateBoard();
+                    break;
+                case "slow down":
+                    decelerateBoard();
+                    break;
+                case "turn right":
+                    rightTurn();
+                    break;
+                case "turn left":
+                    leftTurn();
+                    break;
+                default:
+                    Toast.makeText(this, "Command not recognized", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    }
 
 
 
