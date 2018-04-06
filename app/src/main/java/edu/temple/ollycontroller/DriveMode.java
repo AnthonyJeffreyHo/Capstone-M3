@@ -324,6 +324,7 @@ public class DriveMode extends AppCompatActivity{
 
     private void startBoard()//STARTS BOARD MOVEMENT AND LAUNCHES DRIVE MODE ACTIVITY
     {
+        speed = 100;
         if (btSocket!=null)
         {
             try
@@ -530,11 +531,17 @@ public class DriveMode extends AppCompatActivity{
                 case "slow down":
                     decelerateBoard();
                     break;
-                case "turn right":
+                case "right":
                     rightTurn();
                     break;
-                case "turn left":
+                case "left":
                     leftTurn();
+                    break;
+                case "on":
+                    turnOnBoard();
+                    break;
+                case "off":
+                    turnOnBoard();
                     break;
                 case "start":
                     startBoard();
