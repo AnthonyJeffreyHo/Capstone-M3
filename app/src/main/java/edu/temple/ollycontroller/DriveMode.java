@@ -371,7 +371,7 @@ public class DriveMode extends AppCompatActivity{
                     //speed should equal 120
                     speed = maxSpeed;
                     Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
-                    atMax.start();
+                   // atMax.start();
 
 
                 }
@@ -402,7 +402,7 @@ public class DriveMode extends AppCompatActivity{
                     speed = minSpeed;
 
                     Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                    atMin.start();
+                  //  atMin.start();
                 }
             }
             catch (IOException e)
