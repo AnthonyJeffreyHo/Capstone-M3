@@ -35,6 +35,7 @@ public class DriveMode extends AppCompatActivity{
 
     final int maxSpeed = 120;
     final int minSpeed = 100;
+    boolean turnedOff = false;
     MediaPlayer atMax;
     MediaPlayer atMin;
     ArrayList<String> results;
@@ -232,6 +233,7 @@ public class DriveMode extends AppCompatActivity{
         {
             try
             {//a for arm
+                turnedOff = false;
                 int message_id =  + (rng.nextInt(89)+10);
                 //String message = "a" + message_id;
                 String message = "on";
@@ -246,29 +248,30 @@ public class DriveMode extends AppCompatActivity{
 
     private void turnOffBoard()//DISARMS THE ESC
     {
-        speed = 100;
-        if (btSocket!=null)
-        {
-            int message_id =  + (rng.nextInt(89)+10);
-            //String message = "d" + message_id;
+        if(!turnedOff) {
+            speed = 100;
+            if (btSocket != null) {
+                turnedOff=true;
+                int message_id = +(rng.nextInt(89) + 10);
+                //String message = "d" + message_id;
 
-            try {
-                String message = "off";
-                btSocket.getOutputStream().write(message.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    String message = "off";
+                    btSocket.getOutputStream().write(message.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //protocol_thread pt = new protocol_thread(message,message_id);
+                //Thread disarm_thread = new Thread(pt);
+                //disarm_thread.start();
+
+                //String message = "d" + (rng.nextInt(89)+10);
+                //btSocket.getOutputStream().write(message.getBytes());
+
+                // finish();
+
             }
-
-            //protocol_thread pt = new protocol_thread(message,message_id);
-            //Thread disarm_thread = new Thread(pt);
-            //disarm_thread.start();
-
-            //String message = "d" + (rng.nextInt(89)+10);
-            //btSocket.getOutputStream().write(message.getBytes());
-
-            // finish();
-
-
         }
     }
 
