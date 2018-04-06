@@ -64,7 +64,7 @@ public class BoardControls extends AppCompatActivity {
         LocationListener ll = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                speed_textview.setText("Current Speed: " + getSpeed(location) + " M/S");
+                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
             }
 
             @Override
