@@ -4,13 +4,18 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -18,9 +23,13 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 public class BoardControls extends AppCompatActivity {
+
+    //stuff for bluetooth
+    private Set<BluetoothDevice> pairedDevices;
 
     Button btnOn, btnOff, btnDis, btnStart, btnStop;
     SeekBar brightness;
@@ -35,8 +44,6 @@ public class BoardControls extends AppCompatActivity {
 
     public static String EXTRA_ADDRESS = "device_address";
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +51,9 @@ public class BoardControls extends AppCompatActivity {
 
         Random rng = new Random();
 
-        Intent newint = getIntent();
-        address = newint.getStringExtra(MainActivity.EXTRA_ADDRESS); //receive the address of the bluetooth device
-
-
         String message = null;
 
-        //call the widgtes
+        //call the widgets
         btnOn = (Button)findViewById(R.id.onButton);
         btnOff = (Button)findViewById(R.id.offButton);
         btnDis = (Button)findViewById(R.id.button4);
@@ -59,8 +62,26 @@ public class BoardControls extends AppCompatActivity {
         btnStart = (Button)findViewById(R.id.startButton);
         btnStop = (Button)findViewById(R.id.stopButton);
 
+        //---------------------------------------Check if the device has bluetooth------------------------------------
 
-        new ConnectBT().execute(); //Call the class to connect
+        myBluetooth = BluetoothAdapter.getDefaultAdapter();
+
+        if(myBluetooth == null)
+        {
+            Toast.makeText(getApplicationContext(), "Bluetooth Device Not Available", Toast.LENGTH_LONG).show();
+        }
+        else if(!myBluetooth.isEnabled())
+        {
+            //Ask user to turn on bluetooth
+            Intent turnBTon = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnBTon,1);
+        }
+
+
+        //--------------------------------------Show dialog with paired devices list------------------------------------
+        alertDialog();
+
+        //new ConnectBT().execute(); //Call the class to connect
 
         //----------------------------------------Start of Receiving From Arduino----------------------------------------
         try{
@@ -130,7 +151,7 @@ public class BoardControls extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-               stopBoard();   //method to stop board
+                stopBoard();   //method to stop board
             }
         });
 
@@ -201,16 +222,22 @@ public class BoardControls extends AppCompatActivity {
         if (btSocket!=null)
         {
             int message_id =  + (rng.nextInt(89)+10);
-            String message = "d" + message_id;
+            //String message = "d" + message_id;
+            String message = "off";
+            try {
+                btSocket.getOutputStream().write(message.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-            protocol_thread pt = new protocol_thread(message,message_id);
-            Thread disarm_thread = new Thread(pt);
-            disarm_thread.start();
+            //protocol_thread pt = new protocol_thread(message,message_id);
+            //Thread disarm_thread = new Thread(pt);
+            //disarm_thread.start();
 
             //String message = "d" + (rng.nextInt(89)+10);
             //btSocket.getOutputStream().write(message.getBytes());
 
-           // finish();
+            // finish();
 
 
         }
@@ -224,7 +251,8 @@ public class BoardControls extends AppCompatActivity {
             try
             {//a for arm
                 int message_id =  + (rng.nextInt(89)+10);
-                String message = "a" + message_id;
+                //String message = "a" + message_id;
+                String message = "on";
                 btSocket.getOutputStream().write(message.getBytes());
             }
             catch (IOException e)
@@ -241,17 +269,19 @@ public class BoardControls extends AppCompatActivity {
             try
             {
                 int message_id =  + (rng.nextInt(89)+10);
-                String message = "g" + message_id;
+                //String message = "g" + message_id;
+                String message = "on";
                 btSocket.getOutputStream().write(message.getBytes());
-                //message = "on";
-                //btSocket.getOutputStream().write(message.getBytes());
+                message = "start";
+                btSocket.getOutputStream().write(message.getBytes());
+                Disconnect();
 
 
                 // Make an intent to start next activity.
                 Intent i = new Intent(BoardControls.this, DriveMode.class);
 
                 //Change the activity.
-                i.putExtra(EXTRA_ADDRESS, address); //this will be received at ledControl (class) Activity
+                i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
                 startActivity(i);
 
             }
@@ -269,7 +299,8 @@ public class BoardControls extends AppCompatActivity {
             try
             {
                 int message_id =  + (rng.nextInt(89)+10);
-                String message = "s" + message_id;
+                //String message = "s" + message_id;
+                String message = "stop";
                 btSocket.getOutputStream().write(message.getBytes());
             }
             catch (IOException e)
@@ -279,7 +310,7 @@ public class BoardControls extends AppCompatActivity {
         }
     }
 
-//----------------------------------------------------Start of Temp. Rocker Controls For Testing----------------------------------------------------
+    //----------------------------------------------------Start of Temp. Rocker Controls For Testing----------------------------------------------------
     final int maxSpeed = 120;
     final int minSpeed = 100;
     int speed = 100;
@@ -311,7 +342,8 @@ public class BoardControls extends AppCompatActivity {
                 if (speed <= maxSpeed){//UPPER ROCKER BUTTON
                     int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
-                    String message = "v" + message_id;
+                    //String message = "v" + message_id;
+                    String message = "accel";
                     btSocket.getOutputStream().write(message.getBytes());
                     //message = "on";
                     //btSocket.getOutputStream().write(message.getBytes());
@@ -340,7 +372,8 @@ public class BoardControls extends AppCompatActivity {
                 if (speed > minSpeed) {
                     int message_id =  + (rng.nextInt(89)+10);
                     speed -= 2;
-                    String message = "p" + message_id;
+                    //String message = "p" + message_id;
+                    String message = "decel";
                     btSocket.getOutputStream().write(message.getBytes());
                     //message = "on";
                     //btSocket.getOutputStream().write(message.getBytes());
@@ -360,7 +393,80 @@ public class BoardControls extends AppCompatActivity {
             }
         }
     }
-//----------------------------------------------------End of Temp. Rocker Controls For Testing----------------------------------------------------
+
+    //----------------------------------------------------End of Temp. Rocker Controls For Testing----------------------------------------------------
+
+
+    //----------------------------------------------------Alert Dialog Method---------------------------------------------------
+
+    private void alertDialog(){
+
+        pairedDevices = myBluetooth.getBondedDevices();
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Devices");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(BoardControls.this, android.R.layout.select_dialog_singlechoice);
+
+
+        if (pairedDevices.size()>0)
+        {
+            for(BluetoothDevice bt : pairedDevices)
+            {
+                arrayAdapter.add(bt.getName() + "\n" + bt.getAddress()); //Get the device's name and the address
+            }
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "No Paired Bluetooth Devices Found.", Toast.LENGTH_LONG).show();
+        }
+
+        alert.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        alert.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String info = arrayAdapter.getItem(i);
+                address = info.substring(info.length() - 17);
+                new ConnectBT().execute();
+            }
+        });
+        AlertDialog dialog = alert.create();
+        dialog.show();
+
+    }
+
+    //----------------------------------------------------Menu info-------------------------------------------------------
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_device_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    //-----------------------------------------------End of Menu----------------------------------------------------------
 
 
     private void msg(String s)
