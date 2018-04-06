@@ -536,6 +536,12 @@ public class DriveMode extends AppCompatActivity{
                 case "turn left":
                     leftTurn();
                     break;
+                case "start":
+                    startBoard();
+                    break;
+                case "giraffe":
+                    Toast.makeText(this, "Why?", Toast.LENGTH_SHORT).show();
+                    break;
                 default:
                     Toast.makeText(this, "Command not recognized", Toast.LENGTH_SHORT).show();
                     break;
