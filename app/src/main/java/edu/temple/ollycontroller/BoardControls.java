@@ -57,9 +57,6 @@ public class BoardControls extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_controls);
 
-
-
-
        // Random rng = new Random();
 
         String message = null;
