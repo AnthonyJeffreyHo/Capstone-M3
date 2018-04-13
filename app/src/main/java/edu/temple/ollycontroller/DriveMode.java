@@ -73,14 +73,13 @@ public class DriveMode extends AppCompatActivity{
         String message = null;
 
         //call the widgtes
-        btnStop = (Button) findViewById(R.id.stopButton);
         stopButton = (Button) findViewById(R.id.driveStop);
         btnLeft = (Button) findViewById(R.id.leftButton);
         btnRight = (Button) findViewById(R.id.rightButton);
         btnStart = (Button) findViewById(R.id.start_button);
-        btnOn = (Button) findViewById(R.id.on_button);
         btnOff = (Button) findViewById(R.id.off_button);
 
+        btnOn = (Button) findViewById(R.id.buttonOn);
         atMax = MediaPlayer.create(this, R.raw.pew);
         atMin = MediaPlayer.create(this, R.raw.strange);
 
@@ -97,6 +96,8 @@ public class DriveMode extends AppCompatActivity{
         }
 
         if (message == "stop") {
+
+        } else if(message == "start"){
 
         } else if(message == "on"){
 
@@ -132,12 +133,12 @@ public class DriveMode extends AppCompatActivity{
             }
         });
 
-        btnOn.setOnClickListener(new View.OnClickListener() {
+      /*  btnOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 turnOnBoard();
             }
-        });
+        }); */
 
         btnOff.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,22 +219,8 @@ public class DriveMode extends AppCompatActivity{
 
     //--------------------------Low Level Stuff--------------------------
 
-    private void Disconnect()//DISCONNECTING THE PHONE FROM THE BLUETOOTH MODULE
-    {
-        if (btSocket!=null) //If the btSocket is busy
-        {
-            try
-            {
-                btSocket.close(); //close connection
-            }
-            catch (IOException e)
-            { msg("Error");}
-        }
-        finish(); //return to the first layout
 
-    }
-
-    private void turnOnBoard()//ARMS THE ESC
+   /* private void turnOnBoard()//ARMS THE ESC
     {
         speed = 100;
         if (btSocket!=null)
@@ -251,7 +238,7 @@ public class DriveMode extends AppCompatActivity{
                 msg("Error");
             }
         }
-    }
+    } */
 
     private void turnOffBoard()//DISARMS THE ESC
     {
@@ -276,11 +263,26 @@ public class DriveMode extends AppCompatActivity{
 
                 //String message = "d" + (rng.nextInt(89)+10);
                 //btSocket.getOutputStream().write(message.getBytes());
-
-                // finish();
+                Disconnect();
+                 finish();
 
             }
         }
+    }
+
+    private void Disconnect()//DISCONNECTING THE PHONE FROM THE BLUETOOTH MODULE
+    {
+        if (btSocket!=null) //If the btSocket is busy
+        {
+            try
+            {
+                btSocket.close(); //close connection
+            }
+            catch (IOException e)
+            { msg("Error");}
+        }
+        finish(); //return to the first layout
+
     }
 
     private void leftTurn(){
@@ -521,8 +523,12 @@ public class DriveMode extends AppCompatActivity{
             {
                 msg("Connected.");
                 isBtConnected = true;
-                startBoard();
-                turnOnBoard();
+                String message = "on";
+                try {
+                    btSocket.getOutputStream().write(message.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             progress.dismiss();
         }
@@ -550,11 +556,8 @@ public class DriveMode extends AppCompatActivity{
                 case "left":
                     leftTurn();
                     break;
-                case "on":
-                    turnOnBoard();
-                    break;
                 case "off":
-                    turnOnBoard();
+                    turnOffBoard();
                     break;
                 case "start":
                     startBoard();

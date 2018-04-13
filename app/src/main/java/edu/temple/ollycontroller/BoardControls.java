@@ -38,9 +38,7 @@ public class BoardControls extends AppCompatActivity {
     //stuff for bluetooth
     private Set<BluetoothDevice> pairedDevices;
 
-    Button btnOn, btnOff, btnDis, btnStart, btnStop;
-    SeekBar brightness;
-    TextView lumn;
+    Button btnOn, btnDis;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -61,14 +59,10 @@ public class BoardControls extends AppCompatActivity {
 
         String message = null;
 
+        btnOn = (Button) findViewById(R.id.buttonOn);
+        btnDis = (Button) findViewById(R.id.buttonDisconnect);
+
         //call the widgets
-        btnOn = (Button)findViewById(R.id.onButton);
-        btnOff = (Button)findViewById(R.id.offButton);
-        btnDis = (Button)findViewById(R.id.button4);
-        brightness = (SeekBar)findViewById(R.id.seekBar);
-        lumn = (TextView)findViewById(R.id.lumn);
-        btnStart = (Button)findViewById(R.id.startButton);
-        btnStop = (Button)findViewById(R.id.stopButton);
 
         //---------------------------------------Check if the device has bluetooth------------------------------------
 
@@ -127,82 +121,25 @@ public class BoardControls extends AppCompatActivity {
         //----------------------------------------Start of Commands to Send to Arduino----------------------------------------
 
         //------------------turn on board------------------
-        btnOn.setOnClickListener(new View.OnClickListener()
-        {
+        btnOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
-                turnOnBoard();      //method to turn on
+
+                turnOnBoard();   //method to turn on
             }
         });
 
-        //------------------turn off board------------------
-        btnOff.setOnClickListener(new View.OnClickListener() {
+        btnDis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
-                turnOffBoard();   //method to turn off
+                Disconnect();   //method to disconnect board
             }
         });
 
-        //------------------start movement------------------
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                startBoard();   //method to start board
-            }
-        });
-
-        //------------------stop movement------------------
-        btnStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                stopBoard();   //method to stop board
-            }
-        });
-
-        //------------------Disconnect------------------
-        btnDis.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Disconnect(); //close connection
-            }
-        });
         //----------------------------------------End of Commands to Send to Arduino----------------------------------------
 
-
-        //brightness slider bar thing that might be taken out or reused for something else.....
-        brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser==true)
-                {
-                    lumn.setText(String.valueOf(progress));
-                    try
-                    {
-                        btSocket.getOutputStream().write(String.valueOf(progress).getBytes());
-                    }
-                    catch (IOException e)
-                    {
-
-                    }
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
 
     }
 
@@ -226,36 +163,11 @@ public class BoardControls extends AppCompatActivity {
 
     }
 
-    private void turnOffBoard()//DISARMS THE ESC
-    {
-        if (btSocket!=null)
-        {
-            int message_id =  + (rng.nextInt(89)+10);
-            //String message = "d" + message_id;
-            String message = "off";
-            try {
-                btSocket.getOutputStream().write(message.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            //protocol_thread pt = new protocol_thread(message,message_id);
-            //Thread disarm_thread = new Thread(pt);
-            //disarm_thread.start();
-
-            //String message = "d" + (rng.nextInt(89)+10);
-            //btSocket.getOutputStream().write(message.getBytes());
-
-            // finish();
-
-
-        }
-    }
 
     private void turnOnBoard()//ARMS THE ESC
     {
 
-        if (btSocket!=null)
+      /*  if (btSocket!=null)
         {
             try
             {//a for arm
@@ -268,150 +180,17 @@ public class BoardControls extends AppCompatActivity {
             {
                 msg("Error");
             }
-        }
+        }*/
+
+        Intent i = new Intent(BoardControls.this, DriveMode.class);
+
+        //Change the activity.
+        i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
+        startActivity(i);
     }
 
-    private void startBoard()//STARTS BOARD MOVEMENT AND LAUNCHES DRIVE MODE ACTIVITY
-    {
-        //if (btSocket!=null)
-        //{
-            //try
-            //{
-                //int message_id =  + (rng.nextInt(89)+10);
-                //String message = "g" + message_id;
-                //btSocket.getOutputStream().write(message.getBytes());
-                //message = "start";
-                //btSocket.getOutputStream().write(message.getBytes());
-                //Disconnect();
-
-
-                // Make an intent to start next activity.
-
-        //try
-        //{//a for arm
-            //String message = "on";
-            //btSocket.getOutputStream().write(message.getBytes());
-
-            Intent i = new Intent(BoardControls.this, DriveMode.class);
-
-            //Change the activity.
-            i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
-            startActivity(i);
-        //}
-        //catch (IOException e)
-        //{
-        //    msg("Error");
-        //}
-
-            //}
-            //catch (IOException e)
-            //{
-            //    msg("Error");
-            //}
-        //}
-    }
-
-    private void stopBoard()//STOPS BOARD MOVEMENT
-    {
-        if (btSocket!=null)
-        {
-            try
-            {
-                int message_id =  + (rng.nextInt(89)+10);
-                //String message = "s" + message_id;
-                String message = "stop";
-                btSocket.getOutputStream().write(message.getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-    }
 
     //----------------------------------------------------Start of Temp. Rocker Controls For Testing----------------------------------------------------
-    final int maxSpeed = 120;
-    final int minSpeed = 100;
-    int speed = 100;
-    MediaPlayer atMax;
-    MediaPlayer atMin;
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        int keyCode = event.getKeyCode();
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            accelerateBoard();
-
-            return true;
-        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            decelerateBoard();
-
-            return true;
-        } else {
-            return super.dispatchKeyEvent(event);
-        }
-    }
-
-    private void accelerateBoard(){
-        if (btSocket!=null)
-        {
-            try
-            {
-                //speed range 100-118
-                if (speed < maxSpeed){//UPPER ROCKER BUTTON
-                    int message_id =  + (rng.nextInt(89)+10);
-                    speed += 2;
-                    //String message = "v" + message_id;
-                    String message = "accel";
-                    btSocket.getOutputStream().write(message.getBytes());
-                    //message = "on";
-                    //btSocket.getOutputStream().write(message.getBytes());
-
-                } else{
-                    //speed should equal 120
-                    speed = maxSpeed;
-                    Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
-                   // atMax.start();
-
-
-                }
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-    }
-
-    private void decelerateBoard(){//LOWER ROCKER BUTTON
-        if (btSocket!=null)
-        {
-            try {
-                //speed range 102-120
-                if (speed > minSpeed) {
-                    int message_id =  + (rng.nextInt(89)+10);
-                    speed -= 2;
-                    //String message = "p" + message_id;
-                    String message = "decel";
-                    btSocket.getOutputStream().write(message.getBytes());
-                    //message = "on";
-                    //btSocket.getOutputStream().write(message.getBytes());
-
-                }
-                else{
-                    //speed should == 85
-                    speed = minSpeed;
-
-                    Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                    //atMin.start();
-                }
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-    }
 
     //----------------------------------------------------End of Temp. Rocker Controls For Testing----------------------------------------------------
 
