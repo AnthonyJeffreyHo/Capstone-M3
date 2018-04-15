@@ -29,9 +29,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +68,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     private boolean isBtConnected = false;
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
+
 
     MapView map;
     GoogleMap google_maps;
@@ -189,6 +193,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         //-----------------------Start of GOOGLE MAPS And Speed Tracking-----------------------
 
 
+
+
         //------------------------------------Start of Speed Tracking------------------------------------
         final TextView speed_textview = (TextView) findViewById(R.id.speed_text);
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -253,34 +259,38 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
 
-        map = (MapView) findViewById(R.id.map);
-        map.onCreate(savedInstanceState);
-        map.getMapAsync(this);
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
+        }
 
-
-
-        //-----------------------End of GOOGLE MAPS And Speed Tracking-----------------------
-
-
-
-
-
-
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        // mapFragment.onCreate(savedInstanceState);
+        mapFragment.getMapAsync(this);
 
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        google_maps = googleMap;
-
-        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
-        google_maps.animateCamera(cu);
+       // google_maps = googleMap;
+       // CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
+       // google_maps.animateCamera(cu);
         //MarkerOptions pin = new MarkerOptions().position(user_location);
-
-        Toast.makeText(this, "user latlng = " + user_location, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "user latlng = " + user_location, Toast.LENGTH_SHORT).show();
        // googleMap.addMarker(pin);
-
         //Toast.makeText(this, "made it here", Toast.LENGTH_SHORT).show();
+
+        // Add a marker in Sydney, Australia,
+        // and move the map's camera to the same location.
+        LatLng sydney = new LatLng(-33.852, 151.211);
+        googleMap.addMarker(new MarkerOptions().position(sydney)
+                .title("Marker in Sydney"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+
+    //-----------------------End of GOOGLE MAPS And Speed Tracking-----------------------
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState){
