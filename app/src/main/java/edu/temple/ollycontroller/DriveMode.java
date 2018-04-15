@@ -48,7 +48,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     private Set<BluetoothDevice> pairedDevices;
 
-    final int maxSpeed = 120;
+    int maxSpeed = 120;
+    String intentSpeed = "120";
     final int minSpeed = 100;
     boolean turnedOff = false;
     MediaPlayer atMax;
@@ -85,6 +86,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
         Intent newint = getIntent();
         address = newint.getStringExtra(BoardControls.EXTRA_ADDRESS); //receive the address of the bluetooth device
+        intentSpeed = newint.getStringExtra(BoardControls.SPEED_LEVELS);
+
+        maxSpeed = Integer.parseInt(intentSpeed);
 
         //alertDialog();
 

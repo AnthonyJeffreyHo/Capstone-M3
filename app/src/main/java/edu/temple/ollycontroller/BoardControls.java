@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,11 +23,14 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.io.IOException;
 import java.util.Random;
@@ -44,10 +48,16 @@ public class BoardControls extends AppCompatActivity {
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
+    Spinner mySpinner;
+    public static final String[] speeds = new String[] {"Beginner", "Intermediate", "Pro", "Expert", "ludicrous"};
+    String level = "120";
+
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     public static String EXTRA_ADDRESS = "device_address";
+    public static String SPEED_LEVELS = "Speed";
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -55,12 +65,15 @@ public class BoardControls extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_controls);
 
-       // Random rng = new Random();
+        // Random rng = new Random();
 
         String message = null;
 
+
+
         btnOn = (Button) findViewById(R.id.buttonOn);
         btnDis = (Button) findViewById(R.id.buttonDisconnect);
+
 
         //call the widgets
 
@@ -68,15 +81,12 @@ public class BoardControls extends AppCompatActivity {
 
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
 
-        if(myBluetooth == null)
-        {
+        if (myBluetooth == null) {
             Toast.makeText(getApplicationContext(), "Bluetooth Device Not Available", Toast.LENGTH_LONG).show();
-        }
-        else if(!myBluetooth.isEnabled())
-        {
+        } else if (!myBluetooth.isEnabled()) {
             //Ask user to turn on bluetooth
             Intent turnBTon = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(turnBTon,1);
+            startActivityForResult(turnBTon, 1);
         }
 
 
@@ -86,30 +96,26 @@ public class BoardControls extends AppCompatActivity {
         //new ConnectBT().execute(); //Call the class to connect
 
         //----------------------------------------Start of Receiving From Arduino----------------------------------------
-        try{
-            byte [] bytes_from_arduino = new byte[64];
+        try {
+            byte[] bytes_from_arduino = new byte[64];
             btSocket.getInputStream().read(bytes_from_arduino);
             message = bytes_from_arduino.toString();
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             //nah nothing will go wrong.......
         }
 
+
         //-----------------Start of Handling Info From the Arduino-----------------
-        if(message == "on"){
+        if (message == "on") {
 
-        }
-        else if(message == "off"){
+        } else if (message == "off") {
 
-        }
-        else if(message == "start"){
+        } else if (message == "start") {
 
-        }
-        else if(message == "stop"){
+        } else if (message == "stop") {
 
-        }
-        else{//to see what the message from arduino is if it doesn't match anything in the if-else chain
+        } else {//to see what the message from arduino is if it doesn't match anything in the if-else chain
             Toast.makeText(this, "The message variable = " + message, Toast.LENGTH_LONG).show();
         }
         //-----------------End of Handling Info From the Arduino-----------------
@@ -123,8 +129,7 @@ public class BoardControls extends AppCompatActivity {
         //------------------turn on board------------------
         btnOn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
 
                 turnOnBoard();   //method to turn on
             }
@@ -132,8 +137,7 @@ public class BoardControls extends AppCompatActivity {
 
         btnDis.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Disconnect();   //method to disconnect board
             }
         });
@@ -141,12 +145,45 @@ public class BoardControls extends AppCompatActivity {
         //----------------------------------------End of Commands to Send to Arduino----------------------------------------
 
 
-    }
+        //-----------------Spinner IMPLEMENTATION-----------------------------------
 
+        mySpinner = (Spinner) findViewById(R.id.spinner);              //connect spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, speeds);
+//set the spinners adapter to the previously created one.
+        mySpinner.setAdapter(adapter);
+
+
+
+        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+
+                } else if (position == 1) {
+                    level = "104";
+                } else if (position == 2) {
+                    level = "108";
+                } else if (position == 3) {
+                    level = "112";
+                } else if (position == 4) {
+                    level = "116";
+                } else if (position == 5) {
+                    level = "120";
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+                // sometimes you need nothing here
+            }
+        });
+    }
     //----------------------------------------Start of Private Stuff That Does The Low Level Stuff----------------------------------------
 
 
-    final Random rng = new Random();
+        final Random rng = new Random();
 
     private void Disconnect()//DISCONNECTING THE PHONE FROM THE BLUETOOTH MODULE
     {
@@ -186,6 +223,7 @@ public class BoardControls extends AppCompatActivity {
 
         //Change the activity.
         i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
+        i.putExtra(SPEED_LEVELS, level);
         startActivity(i);
     }
 
