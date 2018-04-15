@@ -218,8 +218,11 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
                 user_location = new LatLng(lat,lng);
 
-                CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
-                google_maps.animateCamera(cu);
+                //CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
+                google_maps.clear();
+                google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));
+                google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));
+
 
 
 
@@ -273,7 +276,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-       // google_maps = googleMap;
+        google_maps = googleMap;
        // CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
        // google_maps.animateCamera(cu);
         //MarkerOptions pin = new MarkerOptions().position(user_location);
@@ -283,10 +286,11 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
-        LatLng sydney = new LatLng(-33.852, 151.211);
-        googleMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-33.852, 151.211);
+        googleMap.addMarker(new MarkerOptions().position(user_location).title("You"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(user_location));
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
+        google_maps.animateCamera(cu);
     }
 
     //-----------------------End of GOOGLE MAPS And Speed Tracking-----------------------
