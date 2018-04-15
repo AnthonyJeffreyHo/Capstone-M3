@@ -1,22 +1,37 @@
 package edu.temple.ollycontroller;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +44,7 @@ import java.util.UUID;
  * Created by krati on 4/4/18.
  */
 
-public class DriveMode extends AppCompatActivity{
+public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     private Set<BluetoothDevice> pairedDevices;
 
@@ -51,6 +66,9 @@ public class DriveMode extends AppCompatActivity{
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    MapView map;
+    GoogleMap google_maps;
+    LatLng user_location;
 
     @Override
     protected void onDestroy(){
@@ -68,7 +86,7 @@ public class DriveMode extends AppCompatActivity{
         Intent newint = getIntent();
         address = newint.getStringExtra(BoardControls.EXTRA_ADDRESS); //receive the address of the bluetooth device
 
-        alertDialog();
+        //alertDialog();
 
         String message = null;
 
@@ -84,36 +102,6 @@ public class DriveMode extends AppCompatActivity{
         atMin = MediaPlayer.create(this, R.raw.strange);
 
 
-        //new ConnectBT().execute(); //Call the class to connect
-
-        try {
-            byte[] bytes_from_arduino = new byte[64];
-            btSocket.getInputStream().read(bytes_from_arduino);
-            message = bytes_from_arduino.toString();
-
-        } catch (Exception e) {
-            //nah nothing will go wrong.......
-        }
-
-        if (message == "stop") {
-
-        } else if(message == "start"){
-
-        } else if(message == "on"){
-
-        } else if (message == "off"){
-
-        } else if (message == "accel") {
-
-        } else if (message == "decel") {
-
-        } else if (message == "left"){
-
-        } else if (message == "right"){
-
-        } else {
-            Toast.makeText(this, "The message variable = " + message, Toast.LENGTH_LONG).show();
-        }
 
         //------------------------------------------------------------------------------------------------------------------------------
         //commands to be sent to bluetooth
@@ -161,9 +149,6 @@ public class DriveMode extends AppCompatActivity{
             }
         });
 
-
-
-
         btnLeft.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -194,7 +179,114 @@ public class DriveMode extends AppCompatActivity{
 
         });
 
+
+
+
+        //-----------------------Start of GOOGLE MAPS And Speed Tracking-----------------------
+
+
+        //------------------------------------Start of Speed Tracking------------------------------------
+        final TextView speed_textview = (TextView) findViewById(R.id.speed_text);
+        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+
+
+        LocationListener ll = new LocationListener() {
+            double lat;
+            double lng;
+
+
+
+
+
+            @Override
+            public void onLocationChanged(Location location) {
+                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
+
+                lat = location.getLatitude();
+                lng = location.getLongitude();
+
+                user_location = new LatLng(lat,lng);
+
+                CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
+                google_maps.animateCamera(cu);
+
+
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
+
+        //------------------------------------End of Speed Tracking------------------------------------
+
+        @SuppressLint("MissingPermission")
+        Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
+
+        map = (MapView) findViewById(R.id.map);
+        map.onCreate(savedInstanceState);
+        map.getMapAsync(this);
+
+
+
+        //-----------------------End of GOOGLE MAPS And Speed Tracking-----------------------
+
+
+
+
+
+
+
     }
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        google_maps = googleMap;
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
+        google_maps.animateCamera(cu);
+        //MarkerOptions pin = new MarkerOptions().position(user_location);
+
+        Toast.makeText(this, "user latlng = " + user_location, Toast.LENGTH_SHORT).show();
+       // googleMap.addMarker(pin);
+
+        //Toast.makeText(this, "made it here", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        map.onSaveInstanceState(outState);
+    }
+
+
+
+
 
 
     @Override
@@ -479,6 +571,8 @@ public class DriveMode extends AppCompatActivity{
 
     }
 
+
+
     private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
     {
         private boolean ConnectSuccess = true; //if it's here, it's almost connected
@@ -571,6 +665,24 @@ public class DriveMode extends AppCompatActivity{
             }
         }
     }
+
+    Location pre_loc = null;
+    private float getSpeed(Location curr_loc){
+        if(curr_loc.hasSpeed()){return curr_loc.getSpeed();}
+        if(pre_loc != null){
+            float distance_traveled = pre_loc.distanceTo(curr_loc);
+            long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
+            return (distance_traveled/time_since_last_location);
+        }
+        else {
+            pre_loc = curr_loc;
+            return 0;
+        }
+
+    }
+
+
+
 
 
 
