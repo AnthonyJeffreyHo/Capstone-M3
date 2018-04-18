@@ -80,7 +80,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         super.onDestroy();
         turnOffBoard();
     }
-
+    //---------------------------------------------End of OnCreate()---------------------------------------------
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +94,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
         maxSpeed = Integer.parseInt(intentSpeed);
 
-        //alertDialog();
+
 
         String message = null;
 
@@ -124,8 +124,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onClick(View view) {
                 stopBoard();
-                //finish();
-                //program a thing to pop the activity form the stack
             }
         });
 
@@ -211,7 +209,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
             @Override
             public void onLocationChanged(Location location) {
-                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
+                speed_textview.setText("Current Speed: " + (getSpeed(location) + " MPH"));
 
                 lat = location.getLatitude();
                 lng = location.getLongitude();
@@ -272,8 +270,11 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         // mapFragment.onCreate(savedInstanceState);
         mapFragment.getMapAsync(this);
 
-    }
 
+
+        alertDialog();
+    }
+    //---------------------------------------------End of OnCreate()---------------------------------------------
     @Override
     public void onMapReady(GoogleMap googleMap) {
         google_maps = googleMap;
@@ -284,9 +285,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
        // googleMap.addMarker(pin);
         //Toast.makeText(this, "made it here", Toast.LENGTH_SHORT).show();
 
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-        //LatLng sydney = new LatLng(-33.852, 151.211);
         googleMap.addMarker(new MarkerOptions().position(user_location).title("You"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(user_location));
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
@@ -299,14 +297,14 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
-        map.onSaveInstanceState(outState);
+//        map.onSaveInstanceState(outState);
     }
 
 
 
 
 
-
+//----------------------Start of Volume Rocker Override Code----------------------
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
@@ -322,33 +320,11 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             return super.dispatchKeyEvent(event);
         }
     }
-
-
-
-
+//----------------------End of Volume Rocker Override Code----------------------
 
     //--------------------------Low Level Stuff--------------------------
 
-
-   /* private void turnOnBoard()//ARMS THE ESC
-    {
-        speed = 100;
-        if (btSocket!=null)
-        {
-            try
-            {//a for arm
-                turnedOff = false;
-                int message_id =  + (rng.nextInt(89)+10);
-                //String message = "a" + message_id;
-                String message = "on";
-                btSocket.getOutputStream().write(message.getBytes());
-            }
-            catch (IOException e)
-            {
-                msg("Error");
-            }
-        }
-    } */
+    Random rng = new Random();
 
     private void turnOffBoard()//DISARMS THE ESC
     {
@@ -395,7 +371,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
-    private void leftTurn(){
+    private void leftTurn()//sends message to blink the left LED light
+    {
         if (btSocket!=null)
         {
             try
@@ -412,7 +389,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void rightTurn(){
+    private void rightTurn()//sends message to blink the right LED light
+    {
         if (btSocket!=null)
         {
             try
@@ -429,7 +407,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void stopBoard(){
+    private void stopBoard()//Stops board movement
+    {
         speed = 100;
             try
             {
@@ -445,7 +424,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
-    private void startBoard()//STARTS BOARD MOVEMENT AND LAUNCHES DRIVE MODE ACTIVITY
+    private void startBoard()//Starts board movement
     {
         String message;
         speed = 100;
@@ -479,9 +458,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    Random rng = new Random();
-
-    private void accelerateBoard(){
+    private void accelerateBoard()//Increases board speed
+    {
         if (btSocket!=null)
         {
             try
@@ -511,7 +489,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void decelerateBoard(){
+    private void decelerateBoard()//Decreases board speed
+    {
         if (btSocket!=null)
         {
             try {
@@ -521,8 +500,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                     speed -= 2;
                     String message = "decel";
                     btSocket.getOutputStream().write(message.getBytes());
-                    //message = "on";
-                    //btSocket.getOutputStream().write(message.getBytes());
 
                 }
                 else{
@@ -540,13 +517,13 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-
     private void msg(String s)
     {
         Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
 
-    private void alertDialog(){
+    private void alertDialog()//Dialog box that prompts the bluetooth connection with board's bluetooth module
+    {
 
         myBluetooth = BluetoothAdapter.getDefaultAdapter();
         pairedDevices = myBluetooth.getBondedDevices();
@@ -589,9 +566,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
-
-
-    private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
+    private class ConnectBT extends AsyncTask<Void, Void, Void>  // The code to create a socket to the bluetooth moduel
     {
         private boolean ConnectSuccess = true; //if it's here, it's almost connected
 
@@ -647,7 +622,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data)//Voice control's voice command handling
+    {
         if(requestCode == 2){
             results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             String text = results.get(0);
@@ -685,12 +661,13 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     Location pre_loc = null;
-    private float getSpeed(Location curr_loc){
-        if(curr_loc.hasSpeed()){return curr_loc.getSpeed();}
+    private int getSpeed(Location curr_loc)//Calculation of speed in Miles Per Hour
+    {
+        if(curr_loc.hasSpeed()){return (int)curr_loc.getSpeed();}
         if(pre_loc != null){
             float distance_traveled = pre_loc.distanceTo(curr_loc);
             long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
-            return (distance_traveled/time_since_last_location);
+            return (int)((distance_traveled/time_since_last_location)*(2.23694));
         }
         else {
             pre_loc = curr_loc;
