@@ -65,6 +65,8 @@ public class BoardControls extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_controls);
 
+
+
         // Random rng = new Random();
 
         String message = null;
@@ -179,6 +181,9 @@ public class BoardControls extends AppCompatActivity {
                 // sometimes you need nothing here
             }
         });
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},111);
+        }
     }
     //----------------------------------------Start of Private Stuff That Does The Low Level Stuff----------------------------------------
 

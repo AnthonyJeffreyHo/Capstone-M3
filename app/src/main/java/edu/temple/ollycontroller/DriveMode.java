@@ -197,15 +197,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         final TextView speed_textview = (TextView) findViewById(R.id.speed_text);
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-
-
         LocationListener ll = new LocationListener() {
             double lat;
             double lng;
-
-
-
-
 
             @Override
             public void onLocationChanged(Location location) {
@@ -216,14 +210,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
                 user_location = new LatLng(lat,lng);
 
-                //CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
                 google_maps.clear();
                 google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));
                 google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));
-
-
-
-
             }
 
             @Override
@@ -243,20 +232,13 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         };
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(this, "You must give OllyController permission to use GPS", Toast.LENGTH_SHORT).show();
             return;
         }
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
 
         //------------------------------------End of Speed Tracking------------------------------------
 
-        @SuppressLint("MissingPermission")
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
 
@@ -278,15 +260,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         google_maps = googleMap;
-       // CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
-       // google_maps.animateCamera(cu);
-        //MarkerOptions pin = new MarkerOptions().position(user_location);
-       // Toast.makeText(this, "user latlng = " + user_location, Toast.LENGTH_SHORT).show();
-       // googleMap.addMarker(pin);
-        //Toast.makeText(this, "made it here", Toast.LENGTH_SHORT).show();
 
-        googleMap.addMarker(new MarkerOptions().position(user_location).title("You"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(user_location));
+        google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));
+        google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
         google_maps.animateCamera(cu);
     }
@@ -675,11 +651,5 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
 
     }
-
-
-
-
-
-
 
 }
