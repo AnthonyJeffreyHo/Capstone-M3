@@ -127,13 +127,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
 
-      /*  btnOn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                turnOnBoard();
-            }
-        }); */
-
         btnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -185,15 +178,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
         });
 
-
-
-
-        //-----------------------Start of GOOGLE MAPS And Speed Tracking-----------------------
-
-
-
-
-        //------------------------------------Start of Speed Tracking------------------------------------
+        //------------------------------------Start of Speed Tracking and Google Maps------------------------------------
         final TextView speed_textview = (TextView) findViewById(R.id.speed_text);
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -214,21 +199,12 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                 google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));
                 google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));
             }
-
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
             @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
+            public void onProviderEnabled(String provider) {}
             @Override
-            public void onProviderDisabled(String provider) {
-
-            }
+            public void onProviderDisabled(String provider) {}
         };
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -236,8 +212,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             return;
         }
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
-
-        //------------------------------------End of Speed Tracking------------------------------------
 
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
@@ -267,15 +241,12 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         google_maps.animateCamera(cu);
     }
 
-    //-----------------------End of GOOGLE MAPS And Speed Tracking-----------------------
-
-
     @Override
     protected void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
 //        map.onSaveInstanceState(outState);
     }
-
+    //------------------------------------Start of Speed Tracking and Google Maps------------------------------------
 
 
 

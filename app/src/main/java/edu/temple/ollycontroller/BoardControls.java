@@ -107,22 +107,6 @@ public class BoardControls extends AppCompatActivity {
             //nah nothing will go wrong.......
         }
 
-
-        //-----------------Start of Handling Info From the Arduino-----------------
-        if (message == "on") {
-
-        } else if (message == "off") {
-
-        } else if (message == "start") {
-
-        } else if (message == "stop") {
-
-        } else {//to see what the message from arduino is if it doesn't match anything in the if-else chain
-            Toast.makeText(this, "The message variable = " + message, Toast.LENGTH_LONG).show();
-        }
-        //-----------------End of Handling Info From the Arduino-----------------
-
-
         //----------------------------------------End of Receiving From Arduino----------------------------------------
 
 
