@@ -1,7 +1,6 @@
 package edu.temple.ollycontroller;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,6 +8,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,6 +34,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -185,19 +187,31 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         LocationListener ll = new LocationListener() {
             double lat;
             double lng;
+            int counter = 1;
+            LatLng[] location_list = new LatLng[0];
+
+            PolylineOptions lines = new PolylineOptions().add(location_list).width(5).color(Color.RED);
 
             @Override
             public void onLocationChanged(Location location) {
                 speed_textview.setText("Current Speed: " + (getSpeed(location) + " MPH"));
 
-                lat = location.getLatitude();
-                lng = location.getLongitude();
 
-                user_location = new LatLng(lat,lng);
+                user_location = new LatLng(location.getLatitude(),location.getLongitude());
+                location_list = update_lines(location_list,user_location,counter);
+                counter++;
+                //location_list[counter] = user_location;
 
-                google_maps.clear();
-                google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));
-                google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));
+
+                google_maps.clear();//clears maps for updated info
+                Polyline line = google_maps.addPolyline(new PolylineOptions().add(location_list).width(5).color(Color.RED));//adds polylines
+                google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));//adds marker for your location
+                google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));//moves camera to you
+
+
+
+                //lines = new PolylineOptions().add(location_list).width(5).color(Color.RED);
+                //google_maps.addPolyline(lines);
             }
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -221,8 +235,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
         }
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         // mapFragment.onCreate(savedInstanceState);
         mapFragment.getMapAsync(this);
 
@@ -268,6 +281,12 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 //----------------------End of Volume Rocker Override Code----------------------
+
+
+
+
+
+
 
     //--------------------------Low Level Stuff--------------------------
 
@@ -621,6 +640,22 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             return 0;
         }
 
+    }
+
+    public LatLng[] update_lines(LatLng[] location_list,LatLng user_location, int counter){
+        int i = 0;
+        LatLng[] new_list = new LatLng[counter];
+
+        while(i < location_list.length){
+            new_list[i] = location_list[i];
+            i++;
+        }
+        new_list[counter-1] = user_location;
+
+
+
+
+        return new_list;
     }
 
 }
