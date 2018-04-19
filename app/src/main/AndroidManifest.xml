@@ -29,7 +29,8 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".BoardControls">
+        <activity android:name=".BoardControls"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +38,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DriveMode"></activity>
+        <activity android:name=".DriveMode"
+            android:screenOrientation="portrait"
+            >
+
+
+        </activity>
     </application>
 
 </manifest>

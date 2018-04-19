@@ -225,7 +225,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             Toast.makeText(this, "You must give OllyController permission to use GPS", Toast.LENGTH_SHORT).show();
             return;
         }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1111, 5, ll);
 
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
