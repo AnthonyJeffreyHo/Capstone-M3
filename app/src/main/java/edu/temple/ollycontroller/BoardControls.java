@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,6 +49,9 @@ public class BoardControls extends AppCompatActivity {
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
+    private boolean stopMe = false;
+    private boolean startMe = false;
+    private boolean tog = true;
     Spinner mySpinner;
     public static final String[] speeds = new String[] {"Beginner", "Intermediate", "Pro", "Expert", "ludicrous"};
     String level = "120";
@@ -207,13 +211,34 @@ public class BoardControls extends AppCompatActivity {
                 msg("Error");
             }
         }*/
-
+        Toggler();
         Intent i = new Intent(BoardControls.this, DriveMode.class);
 
         //Change the activity.
         i.putExtra(EXTRA_ADDRESS, address); //this will be received at DriveMode (class) Activity
-        i.putExtra(SPEED_LEVELS, level);
+        if (tog == true) {
+            i.putExtra(SPEED_LEVELS, level);
+        }
+        else{
+            i.putExtra(SPEED_LEVELS, "120");
+        }
         startActivity(i);
+    }
+
+
+    private void Toggler(){
+
+        ToggleButton toggle = (ToggleButton) findViewById(R.id.speedToggle);
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    tog = true;
+                } else {
+                    tog = false;
+                }
+            }
+        });
+
     }
 
 

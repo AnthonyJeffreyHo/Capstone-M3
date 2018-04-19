@@ -68,6 +68,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
+    private boolean stopMe = false;
+    private boolean startMe = false;
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -376,6 +378,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     private void stopBoard()//Stops board movement
     {
         speed = 100;
+        stopMe = false;
             try
             {
                 int message_id =  + (rng.nextInt(89)+10);
@@ -394,6 +397,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     {
         String message;
         speed = 100;
+        startMe = true;
+        stopMe = false;
         if (btSocket!=null)
         {
             try
@@ -424,14 +429,14 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void accelerateBoard()//Increases board speed
-    {
+    private void accelerateBoard(){
         if (btSocket!=null)
         {
             try
             {
                 //speed range 100-118
                 if (speed < maxSpeed){
+                    stopMe = false;
                     //int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
                     String message = "accel";
@@ -439,7 +444,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                     //message = "on";
                     //btSocket.getOutputStream().write(message.getBytes());
 
-                } else{
+                } else if(startMe == false){
+                    startBoard();
+                }else{
                     //speed should equal 120
                     speed = maxSpeed;
                     Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
@@ -455,8 +462,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void decelerateBoard()//Decreases board speed
-    {
+    private void decelerateBoard(){
         if (btSocket!=null)
         {
             try {
@@ -466,14 +472,24 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                     speed -= 2;
                     String message = "decel";
                     btSocket.getOutputStream().write(message.getBytes());
+                    //message = "on";
+                    //btSocket.getOutputStream().write(message.getBytes());
 
                 }
                 else{
-                    //speed should == 85
+                    //speed should == 100
+
+
                     speed = minSpeed;
 
                     Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                    atMin.start();
+                    if(stopMe == false) {
+                        atMin.start();
+                        stopMe = true;
+                    }
+                    else{
+                        stopBoard();
+                    }
                 }
             }
             catch (IOException e)
