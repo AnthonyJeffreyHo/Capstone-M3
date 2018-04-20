@@ -420,7 +420,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         String message;
         speed = 100;
         startMe = true;
-        stopMe = false;
         if (btSocket!=null)
         {
             try
@@ -458,17 +457,16 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             try
             {
                 //speed range 100-118
+
+                if(startMe == false){
+                startBoard();
+            }
                 if (speed < maxSpeed){
                     stopMe = false;
                     //int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
                     String message = "accel";
                     btSocket.getOutputStream().write(message.getBytes());
-                    //message = "on";
-                    //btSocket.getOutputStream().write(message.getBytes());
-
-                } else if(startMe == false){
-                    startBoard();
                 }else{
                     //speed should equal 120
                     speed = maxSpeed;
