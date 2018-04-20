@@ -248,7 +248,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             return;
         }
         lm2.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll_for_speed);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1111, 5, ll_for_maps);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 3, ll_for_maps);
 
 
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -669,14 +669,21 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     Location pre_loc = null;
     private float getSpeed(Location curr_loc)//Calculation of speed in Miles Per Hour
     {
-        //if(curr_loc.hasSpeed()){return (int)curr_loc.getSpeed();}
+        /*
+        if(curr_loc.hasSpeed()){
+            Toast.makeText(this, "here", Toast.LENGTH_SHORT).show();
+            return (float)curr_loc.getSpeed();
+        }
+        */
         if(pre_loc != null){
             float distance_traveled = pre_loc.distanceTo(curr_loc);
             long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
-            return (float)((distance_traveled/time_since_last_location)*(2.23694));
+            Toast.makeText(this, "there", Toast.LENGTH_SHORT).show();
+            return (int)((distance_traveled/time_since_last_location)*(2.23694));
         }
         else {
             pre_loc = curr_loc;
+            Toast.makeText(this, "init", Toast.LENGTH_SHORT).show();
             return 0;
         }
 
