@@ -68,7 +68,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
-    private boolean stopMe = false;
+    private boolean stopMe = true;
     private boolean startMe = false;
     //SPP UUID. Look for it
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -400,7 +400,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     private void stopBoard()//Stops board movement
     {
         speed = 100;
-        stopMe = false;
+        stopMe = true;
+        startMe = false;
+
             try
             {
                 int message_id =  + (rng.nextInt(89)+10);
@@ -420,6 +422,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         String message;
         speed = 100;
         startMe = true;
+        stopMe = false;
         if (btSocket!=null)
         {
             try
@@ -462,7 +465,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                 startBoard();
             }
                 if (speed < maxSpeed){
-                    stopMe = false;
                     //int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
                     String message = "accel";
@@ -505,9 +507,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                     speed = minSpeed;
 
                     Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                    if(stopMe == false) {
+                    if(stopMe == true) {
                         atMin.start();
-                        stopMe = true;
+                        stopMe = false;
                     }
                     else{
                         stopBoard();
