@@ -187,6 +187,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         LocationManager lm2 = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+        //---------------Start of LocationListener For Polylines---------------
         LocationListener ll_for_maps = new LocationListener() {
             double lat;
             double lng;
@@ -197,8 +198,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
             @Override
             public void onLocationChanged(Location location) {
-
-
                 user_location = new LatLng(location.getLatitude(),location.getLongitude());
                 location_list = update_lines(location_list,user_location,counter);
                 counter++;
@@ -208,11 +207,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                 Polyline line = google_maps.addPolyline(new PolylineOptions().add(location_list).width(5).color(Color.RED));//adds polylines
                 google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));//adds marker for your location
                 google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));//moves camera to you
-
-
-
-                //lines = new PolylineOptions().add(location_list).width(5).color(Color.RED);
-                //google_maps.addPolyline(lines);
             }
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -221,6 +215,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onProviderDisabled(String provider) {}
         };
+        //---------------End of LocationListener For Polylines---------------
+
+        //---------------Start of LocationListener For Speed---------------
         LocationListener ll_for_speed = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -242,13 +239,17 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
             }
         };
+        //---------------End of LocationListener For Speed---------------
+
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "You must give OllyController permission to use GPS", Toast.LENGTH_SHORT).show();
             return;
         }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1111, 5, ll_for_maps);
         lm2.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll_for_speed);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1111, 5, ll_for_maps);
+
 
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
@@ -668,7 +669,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     Location pre_loc = null;
     private float getSpeed(Location curr_loc)//Calculation of speed in Miles Per Hour
     {
-        if(curr_loc.hasSpeed()){return (int)curr_loc.getSpeed();}
+        //if(curr_loc.hasSpeed()){return (int)curr_loc.getSpeed();}
         if(pre_loc != null){
             float distance_traveled = pre_loc.distanceTo(curr_loc);
             long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
