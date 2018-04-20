@@ -185,8 +185,9 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         //------------------------------------Start of Speed Tracking and Google Maps------------------------------------
         final TextView speed_textview = (TextView) findViewById(R.id.speed_text);
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+        LocationManager lm2 = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        LocationListener ll = new LocationListener() {
+        LocationListener ll_for_maps = new LocationListener() {
             double lat;
             double lng;
             int counter = 1;
@@ -196,13 +197,11 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
             @Override
             public void onLocationChanged(Location location) {
-                speed_textview.setText("Current Speed: " + (getSpeed(location) + " MPH"));
 
 
                 user_location = new LatLng(location.getLatitude(),location.getLongitude());
                 location_list = update_lines(location_list,user_location,counter);
                 counter++;
-                //location_list[counter] = user_location;
 
 
                 google_maps.clear();//clears maps for updated info
@@ -222,12 +221,34 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onProviderDisabled(String provider) {}
         };
+        LocationListener ll_for_speed = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                speed_textview.setText("Current Speed: " + (getSpeed(location) + " MPH"));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "You must give OllyController permission to use GPS", Toast.LENGTH_SHORT).show();
             return;
         }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1111, 5, ll);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1111, 5, ll_for_maps);
+        lm2.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, ll_for_speed);
 
         Location current_location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         user_location = new LatLng(current_location.getLatitude(),current_location.getLongitude());
@@ -261,7 +282,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         super.onSaveInstanceState(outState);
 //        map.onSaveInstanceState(outState);
     }
-    //------------------------------------Start of Speed Tracking and Google Maps------------------------------------
+    //------------------------------------End of Speed Tracking and Google Maps------------------------------------
 
 
 
@@ -429,7 +450,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void accelerateBoard(){
+    private void accelerateBoard()
+    {
         if (btSocket!=null)
         {
             try
@@ -462,7 +484,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    private void decelerateBoard(){
+    private void decelerateBoard()
+    {
         if (btSocket!=null)
         {
             try {
@@ -643,13 +666,13 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     Location pre_loc = null;
-    private int getSpeed(Location curr_loc)//Calculation of speed in Miles Per Hour
+    private float getSpeed(Location curr_loc)//Calculation of speed in Miles Per Hour
     {
         if(curr_loc.hasSpeed()){return (int)curr_loc.getSpeed();}
         if(pre_loc != null){
             float distance_traveled = pre_loc.distanceTo(curr_loc);
             long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
-            return (int)((distance_traveled/time_since_last_location)*(2.23694));
+            return (float)((distance_traveled/time_since_last_location)*(2.23694));
         }
         else {
             pre_loc = curr_loc;
