@@ -219,9 +219,20 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
         //---------------Start of LocationListener For Speed---------------
         LocationListener ll_for_speed = new LocationListener() {
+            double lat;
+            double lng;
             @Override
             public void onLocationChanged(Location location) {
-                speed_textview.setText("Current Speed: " + (getSpeed(location) + " MPH"));
+                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
+                lat = location.getLatitude();
+                lng = location.getLongitude();
+
+                user_location = new LatLng(lat,lng);
+
+                //CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(user_location,16);
+                //google_maps.clear();
+                //google_maps.addMarker(new MarkerOptions().position(user_location).title("You"));
+                //google_maps.moveCamera(CameraUpdateFactory.newLatLng(user_location));
             }
 
             @Override
@@ -667,23 +678,15 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     }
 
     Location pre_loc = null;
-    private float getSpeed(Location curr_loc)//Calculation of speed in Miles Per Hour
-    {
-        /*
-        if(curr_loc.hasSpeed()){
-            Toast.makeText(this, "here", Toast.LENGTH_SHORT).show();
-            return (float)curr_loc.getSpeed();
-        }
-        */
+    private float getSpeed(Location curr_loc){
+        if(curr_loc.hasSpeed()){return curr_loc.getSpeed();}
         if(pre_loc != null){
             float distance_traveled = pre_loc.distanceTo(curr_loc);
             long time_since_last_location = curr_loc.getTime() - pre_loc.getTime();
-            Toast.makeText(this, "there", Toast.LENGTH_SHORT).show();
-            return (int)((distance_traveled/time_since_last_location)*(2.23694));
+            return (distance_traveled/time_since_last_location);
         }
         else {
             pre_loc = curr_loc;
-            Toast.makeText(this, "init", Toast.LENGTH_SHORT).show();
             return 0;
         }
 
