@@ -223,7 +223,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             double lng;
             @Override
             public void onLocationChanged(Location location) {
-                speed_textview.setText("Current Speed: " + (getSpeed(location)*(2.23694) + " MPH"));
+                speed_textview.setText("Current Speed: " + ((int)(getSpeed(location)*2.23694)) + " MPH");
                 lat = location.getLatitude();
                 lng = location.getLongitude();
 
