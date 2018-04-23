@@ -53,7 +53,7 @@ public class BoardControls extends AppCompatActivity {
     private boolean startMe = false;
     private boolean tog = true;
     Spinner mySpinner;
-    public static final String[] speeds = new String[] {"Beginner", "Intermediate", "Pro", "Expert", "ludicrous"};
+    public static final String[] speeds = new String[] {"Beginner", "Intermediate", "Pro", "Expert", "ludicrous","Wumbo"};
     String level = "120";
 
     //SPP UUID. Look for it
@@ -159,6 +159,8 @@ public class BoardControls extends AppCompatActivity {
                     level = "116";
                 } else if (position == 5) {
                     level = "120";
+                } else if (position == 6) {
+                    Toast.makeText(BoardControls.this, "YOU'RE MAD!!!", Toast.LENGTH_SHORT).show();
                 }
 
             }

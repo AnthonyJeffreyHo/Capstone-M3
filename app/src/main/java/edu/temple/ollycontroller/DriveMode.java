@@ -89,7 +89,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     private static final int LOCATION_REQUEST = 500;
-    ArrayList<LatLng> listPoints;
+    ArrayList<LatLng> listPoints = new ArrayList<>();
 
     MapView map;
     GoogleMap google_maps;
