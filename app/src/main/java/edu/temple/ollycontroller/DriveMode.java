@@ -62,7 +62,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     int speed = 100;
     Button stopButton;
-    Button btnLeft, btnRight, btnStop, btnStart, btnOn, btnOff;
+    Button btnLeft, btnRight, btnStart, btnOn, btnOff;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -292,18 +292,24 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP && startMe == false) {
+            startBoard();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP && startMe == true) {
             accelerateBoard();
-
             return true;
-        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+        } else if ( keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && stopMe == false) {
             decelerateBoard();
-
             return true;
-        } else {
-            return super.dispatchKeyEvent(event);
         }
-    }
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && stopMe == true){
+            stopBoard();
+            return true;
+        }
+            else{
+                return super.dispatchKeyEvent(event);
+            }
+        }
 //----------------------End of Volume Rocker Override Code----------------------
 
 
@@ -332,13 +338,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                //protocol_thread pt = new protocol_thread(message,message_id);
-                //Thread disarm_thread = new Thread(pt);
-                //disarm_thread.start();
-
-                //String message = "d" + (rng.nextInt(89)+10);
-                //btSocket.getOutputStream().write(message.getBytes());
                 Disconnect();
                  finish();
 
@@ -414,7 +413,6 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
             {
                 msg("Error");
             }
-
     }
 
     private void startBoard()//Starts board movement
@@ -459,11 +457,7 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
         {
             try
             {
-                //speed range 100-118
 
-                if(startMe == false){
-                startBoard();
-            }
                 if (speed < maxSpeed){
                     //int message_id =  + (rng.nextInt(89)+10);
                     speed += 2;
@@ -472,9 +466,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                 }else{
                     //speed should equal 120
                     speed = maxSpeed;
-                    Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
                     atMax.start();
-
+                    Toast.makeText(this, "Max speed", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -487,9 +480,12 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
 
     private void decelerateBoard()
     {
+
+
         if (btSocket!=null)
         {
             try {
+
                 //speed range 102-120
                 if (speed > minSpeed) {
                     int message_id =  + (rng.nextInt(89)+10);
@@ -507,13 +503,8 @@ public class DriveMode extends AppCompatActivity implements OnMapReadyCallback {
                     speed = minSpeed;
 
                     Toast.makeText(this, "Lowest speed", Toast.LENGTH_SHORT).show();
-                    if(stopMe == true) {
                         atMin.start();
-                        stopMe = false;
-                    }
-                    else{
-                        stopBoard();
-                    }
+                        stopMe = true;
                 }
             }
             catch (IOException e)
